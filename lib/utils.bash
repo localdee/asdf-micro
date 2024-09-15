@@ -9,29 +9,32 @@ TOOL_TEST="micro --version"
 
 # CUSTOMIZE
 get_download_url() {
-	local version; version="$1"
-	local platform; platform="$2"
-	local arch; arch="$3"
+	local version
+	version="$1"
+	local platform
+	platform="$2"
+	local arch
+	arch="$3"
 
 	local build
-  case "${platform}" in
-    darwin)
-			if [[ "${arch}" == "aarch64" ]]; then
-				build='macos-arm64'
-			else
-				build='macos-arm64'
-			fi
-      ;;
-    linux)
-			if [[ "${arch}" == "aarch64" ]]; then
-				build='linux-arm64'
-			elif [[ "${arch}" == "x86_64" ]]; then
-				build='linux64'
-			else
-				build='linux32'
-			fi
-      ;;
-  esac
+	case "${platform}" in
+	darwin)
+		if [[ "${arch}" == "aarch64" ]]; then
+			build='macos-arm64'
+		else
+			build='macos-arm64'
+		fi
+		;;
+	linux)
+		if [[ "${arch}" == "aarch64" ]]; then
+			build='linux-arm64'
+		elif [[ "${arch}" == "x86_64" ]]; then
+			build='linux64'
+		else
+			build='linux32'
+		fi
+		;;
+	esac
 
 	# https://github.com/zyedidia/micro/releases/download/v2.0.14/micro-2.0.14-linux-arm64.tgz
 	echo -n "$GH_REPO/releases/download/v${version}/${TOOL_NAME}-${version}-${build}.tar.gz"
@@ -43,8 +46,8 @@ list_github_tags() {
 		grep -o 'refs/tags/.*' | cut -d/ -f3- |
 		sed 's/^v//' |
 		grep -v rc |
-		grep -v nightly \
-		# NOTE: You might want to adapt this sed to remove non-version strings from tags
+		grep -v nightly
+	# NOTE: You might want to adapt this sed to remove non-version strings from tags
 }
 
 fail() {
@@ -72,11 +75,16 @@ list_all_versions() {
 
 # MOD - update
 download_release() {
-	local version; version="$1"
-	local filename; filename="$2"
-	local platform; platform="$(get_raw_platform)"
-	local arch; arch="$(get_raw_arch)"
-	local url; url="$(get_download_url "$version" "$platform" "$arch")"
+	local version
+	version="$1"
+	local filename
+	filename="$2"
+	local platform
+	platform="$(get_raw_platform)"
+	local arch
+	arch="$(get_raw_arch)"
+	local url
+	url="$(get_download_url "$version" "$platform" "$arch")"
 
 	echo "* Downloading $TOOL_NAME release $version..."
 	curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
@@ -108,66 +116,28 @@ install_version() {
 }
 
 # MOD - new
-get_arch() {
-  local arch; arch=$(uname -m | tr '[:upper:]' '[:lower:]')
-  local platform; platform=$(get_raw_platform)
-  case ${arch} in
-  arm64)
-    if [[ "${platform}" == "darwin" ]]; then
-      arch='x86_64'
-    else
-      arch='aarch64'
-    fi
-    ;;
-  armv7l)
-    arch='arm'
-    ;;
-  esac
-
-  echo "${arch}"
-}
-
-get_platform() {
-  local plat; plat=$(get_raw_platform)
-  case ${plat} in
-  darwin)
-    plat='apple-darwin'
-    ;;
-  linux)
-    plat='unknown-linux-gnu'
-    [[ $(get_arch) == "arm" ]] && plat='unknown-linux-gnueabihf'
-    ;;
-  windows)
-    plat='pc-windows-msvc'
-    ;;
-  esac
-
-  echo -n "${plat}"
-}
-
 get_raw_platform() {
 	# MAC: darwin
 	# LINUX: linux
-  uname | tr '[:upper:]' '[:lower:]'
+	uname | tr '[:upper:]' '[:lower:]'
 }
 
 get_raw_arch() {
 	# MAC: arm64
 	# LINUX: aarch64
 	# LINUX: x86_64
-  uname -m | tr '[:upper:]' '[:lower:]'
+	uname -m | tr '[:upper:]' '[:lower:]'
 }
 
 get_raw_kernel() {
 	# MAC: darwin
 	# LINUX: linux
-  uname -s | tr '[:upper:]' '[:lower:]'
+	uname -s | tr '[:upper:]' '[:lower:]'
 }
 
 get_raw_processor() {
 	# MAC: arm
 	# LINUX: x86_64
 	# LINUX: unknown
-  uname | tr '[:upper:]' '[:lower:]'
+	uname | tr '[:upper:]' '[:lower:]'
 }
-
