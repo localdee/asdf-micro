@@ -88,7 +88,7 @@ download_release() {
 	local processor
 	arch="$(get_raw_processor)"
 	local url
-	url="$(get_download_url "$version" "$platform" "$arch")"
+	url="$(get_download_url "$version" "$platform" "$arch" "$processor")"
 
 	echo "* Downloading $TOOL_NAME release $version..."
 	curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
