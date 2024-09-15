@@ -15,6 +15,8 @@ get_download_url() {
 	platform="$2"
 	local arch
 	arch="$3"
+	local processor
+	processor="$4"
 
 	local build
 	case "${platform}" in
@@ -83,6 +85,8 @@ download_release() {
 	platform="$(get_raw_platform)"
 	local arch
 	arch="$(get_raw_arch)"
+	local processor
+	arch="$(get_raw_processor)"
 	local url
 	url="$(get_download_url "$version" "$platform" "$arch")"
 
