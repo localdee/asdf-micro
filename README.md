@@ -13,20 +13,11 @@
 - [Contributing](#contributing)
 - [License](#license)
 
-# Dependencies
-
-**TODO: adapt this section**
-
-- `bash`, `curl`, `tar`, and [POSIX utilities](https://pubs.opengroup.org/onlinepubs/9699919799/idx/utilities.html).
-- `SOME_ENV_VAR`: set this environment variable in your shell config to load the correct version of tool x.
-
 # Install
 
 Plugin:
 
 ```shell
-asdf plugin add locald-micro
-# or
 asdf plugin add locald-micro https://github.com/localdee/asdf-micro.git
 ```
 
@@ -42,7 +33,7 @@ asdf install locald-micro latest
 # Set a version globally (on your ~/.tool-versions file)
 asdf global locald-micro latest
 
-# Now locald-micro commands are available
+# Now micro commands are available
 micro --version
 ```
 
