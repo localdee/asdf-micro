@@ -86,7 +86,7 @@ download_release() {
 	local arch
 	arch="$(get_raw_arch)"
 	local processor
-	arch="$(get_raw_processor)"
+	processor="$(get_raw_processor)"
 	local url
 	url="$(get_download_url "$version" "$platform" "$arch" "$processor")"
 
