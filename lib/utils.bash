@@ -15,6 +15,8 @@ get_download_url() {
 	platform="$2"
 	local arch
 	arch="$3"
+	local processor
+	processor="$4"
 
 	local build
 	case "${platform}" in
@@ -83,8 +85,10 @@ download_release() {
 	platform="$(get_raw_platform)"
 	local arch
 	arch="$(get_raw_arch)"
+	local processor
+	processor="$(get_raw_processor)"
 	local url
-	url="$(get_download_url "$version" "$platform" "$arch")"
+	url="$(get_download_url "$version" "$platform" "$arch" "$processor")"
 
 	echo "* Downloading $TOOL_NAME release $version..."
 	curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
