@@ -10,31 +10,31 @@ TOOL_TEST="micro --version"
 # CUSTOMIZE
 get_download_url() {
 	local version; version="$1"
-	local filename; filename="$2"
-	local platform; platform="$(get_raw_platform)"
-	local arch; arch="$(get_raw_arch)"
+	local platform; platform="$2"
+	local arch; arch="$3"
 
-  case "${arch}" in
-    aarch64)
-			if [[ "${platform}" == "darwin" ]]; then
-				arch='arm64'
-			else
-				arch='arm64'
-			fi
-			;;
-    *)
-      echo -n ""
-      ;;
-  esac
-
+	local build
   case "${platform}" in
     darwin)
-			platform='macos'
+			if [[ "${arch}" == "aarch64" ]]; then
+				build='macos-arm64'
+			else
+				build='macos-arm64'
+			fi
+      ;;
+    linux)
+			if [[ "${arch}" == "aarch64" ]]; then
+				build='linux-arm64'
+			elif [[ "${arch}" == "x86_64" ]]; then
+				build='linux64'
+			else
+				build='linux32'
+			fi
       ;;
   esac
 
 	# https://github.com/zyedidia/micro/releases/download/v2.0.14/micro-2.0.14-linux-arm64.tgz
-	echo -n "$GH_REPO/releases/download/v${version}/${TOOL_NAME}-${version}-${platform}-${arch}.tgz"
+	echo -n "$GH_REPO/releases/download/v${version}/${TOOL_NAME}-${version}-${build}.tar.gz"
 }
 
 # CUSTOMIZE
@@ -74,7 +74,9 @@ list_all_versions() {
 download_release() {
 	local version; version="$1"
 	local filename; filename="$2"
-	local url; url="$(get_download_url "$version" "$filename")"
+	local platform; platform="$(get_raw_platform)"
+	local arch; arch="$(get_raw_arch)"
+	local url; url="$(get_download_url "$version" "$platform" "$arch")"
 
 	echo "* Downloading $TOOL_NAME release $version..."
 	curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
@@ -143,9 +145,16 @@ get_platform() {
   echo -n "${plat}"
 }
 
+get_raw_platform() {
+	# MAC: darwin
+	# LINUX: linux
+  uname | tr '[:upper:]' '[:lower:]'
+}
+
 get_raw_arch() {
 	# MAC: arm64
 	# LINUX: aarch64
+	# LINUX: x86_64
   uname -m | tr '[:upper:]' '[:lower:]'
 }
 
@@ -155,14 +164,9 @@ get_raw_kernel() {
   uname -s | tr '[:upper:]' '[:lower:]'
 }
 
-get_raw_platform() {
-	# MAC: darwin
-	# LINUX: linux
-  uname | tr '[:upper:]' '[:lower:]'
-}
-
 get_raw_processor() {
 	# MAC: arm
+	# LINUX: x86_64
 	# LINUX: unknown
   uname | tr '[:upper:]' '[:lower:]'
 }
