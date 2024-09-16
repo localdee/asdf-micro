@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC1091
 
 set -euo pipefail
 
@@ -7,50 +8,11 @@ GH_REPO="https://github.com/zyedidia/micro"
 TOOL_NAME="micro"
 TOOL_TEST="micro --version"
 
-# CUSTOMIZE
-get_download_url() {
-	local version
-	version="$1"
-	local platform
-	platform="$2"
-	local arch
-	arch="$3"
-	local processor
-	processor="$4"
+# get the directory of the current script
+utils_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-	local build
-	case "${platform}" in
-	darwin)
-		if [[ "${arch}" == "aarch64" ]]; then
-			build='macos-arm64'
-		else
-			build='macos-arm64'
-		fi
-		;;
-	linux)
-		if [[ "${arch}" == "aarch64" ]]; then
-			build='linux-arm64'
-		elif [[ "${arch}" == "x86_64" ]]; then
-			build='linux64'
-		else
-			build='linux32'
-		fi
-		;;
-	esac
-
-	# https://github.com/zyedidia/micro/releases/download/v2.0.14/micro-2.0.14-linux-arm64.tgz
-	echo -n "$GH_REPO/releases/download/v${version}/${TOOL_NAME}-${version}-${build}.tar.gz"
-}
-
-# CUSTOMIZE
-list_github_tags() {
-	git ls-remote --tags --refs "$GH_REPO" |
-		grep -o 'refs/tags/.*' | cut -d/ -f3- |
-		sed 's/^v//' |
-		grep -v rc |
-		grep -v nightly
-	# NOTE: You might want to adapt this sed to remove non-version strings from tags
-}
+# source the custom script if it exists
+source "${utils_dir}/plugin.bash"
 
 fail() {
 	echo -e "asdf-$TOOL_NAME: $*"
@@ -69,12 +31,6 @@ sort_versions() {
 		LC_ALL=C sort -t. -k 1,1 -k 2,2n -k 3,3n -k 4,4n -k 5,5n | awk '{print $2}'
 }
 
-list_all_versions() {
-	# TODO: Adapt this. By default we simply list the tag names from GitHub releases.
-	# Change this function if micro has other means of determining installable versions.
-	list_github_tags
-}
-
 # MOD - update
 download_release() {
 	local version
@@ -89,7 +45,7 @@ download_release() {
 	processor="$(get_raw_processor)"
 
 	local url
-	url="$(get_download_url "$version" "$platform" "$arch" "$processor")"
+	url="$(get_download_url "$GH_REPO" "$version" "$platform" "$arch" "$processor")"
 
 	echo "* Downloading $TOOL_NAME release $version..."
 	curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
